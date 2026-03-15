@@ -1,0 +1,129 @@
+{
+    "app": {
+        "title": "மொய் அப்ளிகேஷன்",
+        "subtitle": "பரிசு பங்களிப்பு கண்காணிப்பு"
+    },
+    "nav": {
+        "newEvent": "புதிய நிகழ்வு",
+        "admin": "நிர்வாகி",
+        "adminPanel": "நிர்வாக பேனல்",
+        "logout": "வெளியேறு",
+        "functions": "நிகழ்வு வகைகள்",
+        "settings": "அமைப்புகள்"
+    },
+    "home": {
+        "heroTitle": "பரிசு பங்களிப்பு\nகண்காணிப்பு",
+        "heroSubtitle": "ஒரு நிகழ்வை உருவாக்கி, உங்கள் விருந்தினர்களிடமிருந்து பரிசு பதிவுகளை சேகரிக்கத் தொடங்குங்கள்.",
+        "createEvent": "நிகழ்வு உருவாக்கு",
+        "functionType": "நிகழ்வு வகை",
+        "person1": "நபர் 1 பெயர்",
+        "person2": "நபர் 2 பெயர்",
+        "person1Placeholder": "எ.கா. அர்ஜுன் குமார்",
+        "person2Placeholder": "எ.கா. பிரியா சர்மா",
+        "location": "இடம்",
+        "locationPlaceholder": "எ.கா. மதுரை, தமிழ்நாடு",
+        "phone": "தொலைபேசி எண்",
+        "phonePlaceholder": "எ.கா. +91 98765 43210",
+        "eventDate": "நிகழ்வு தேதி",
+        "startCollection": "🎊 பரிசு சேகரிப்பைத் தொடங்கு",
+        "creating": "உருவாக்குகிறது..."
+    },
+    "gifts": {
+        "addGift": "➕ பரிசு சேர்",
+        "donorName": "நன்கொடையாளர் பெயர்",
+        "donorNamePlaceholder": "எ.கா. ரவி குமார்",
+        "place": "இடம்",
+        "placePlaceholder": "எ.கா. சென்னை",
+        "amount": "தொகை (₹)",
+        "amountPlaceholder": "எ.கா. 5000",
+        "selectTypist": "டைபிஸ்ட் தேர்வு",
+        "noTypist": "டைபிஸ்ட் இல்லை",
+        "saveGift": "💾 பரிசு சேமி",
+        "saving": "சேமிக்கிறது...",
+        "giftRecords": "பரிசு பதிவுகள்",
+        "totalGiftAmount": "🏆 மொத்த பரிசு தொகை",
+        "noGiftsYet": "இதுவரை பரிசுகள் பதிவாகவில்லை. முதல் பரிசை சேர்க்கவும்!",
+        "createAnother": "← மற்றொரு நிகழ்வு உருவாக்கு",
+        "gifts": "பரிசுகள்",
+        "total": "மொத்தம்",
+        "denomination": "மதிப்பு",
+        "quantity": "எண்ணிக்கை",
+        "addDenomination": "+ வரிசை சேர்",
+        "denominations": "பிரிவுகள்"
+    },
+    "receipt": {
+        "contributingDetails": "பங்களிப்பு விவரங்கள்",
+        "totalPrice": "மொத்த விலை",
+        "receiptNo": "ரசீது #",
+        "typist": "டைபிஸ்ட்",
+        "printReceipt": "🖨️ ரசீது அச்சிடு"
+    },
+    "admin": {
+        "login": "🔐 நிர்வாகி உள்நுழைவு",
+        "loginSubtitle": "நிர்வாக பேனலை அணுகு",
+        "username": "பயனர் பெயர்",
+        "password": "கடவுச்சொல்",
+        "loginBtn": "🔑 உள்நுழை",
+        "loggingIn": "உள்நுழைகிறது...",
+        "defaultCreds": "இயல்புநிலை: admin / admin123",
+        "dashboard": "🎊 நிர்வாக டாஷ்போர்டு",
+        "dashboardSubtitle": "அனைத்து நிகழ்வுகளையும் பரிசு பதிவுகளையும் நிர்வகிக்கவும்",
+        "searchPlaceholder": "பெயர், இடம் மூலம் தேடு...",
+        "search": "🔍 தேடு",
+        "clear": "அழி",
+        "noEvents": "நிகழ்வுகள் இல்லை.",
+        "createOne": "ஒன்று உருவாக்கு!",
+        "viewGifts": "பரிசுகள் பார் →",
+        "backToDashboard": "← டாஷ்போர்டுக்கு திரும்பு",
+        "addMoreGifts": "➕ மேலும் பரிசுகள் சேர்"
+    },
+    "functions": {
+        "title": "📋 நிகழ்வு வகை நிர்வாகம்",
+        "subtitle": "நிகழ்வு வகைகளை சேர்த்து நிர்வகிக்கவும்",
+        "englishName": "ஆங்கில பெயர்",
+        "tamilName": "தமிழ் பெயர்",
+        "addFunction": "➕ நிகழ்வு வகை சேர்",
+        "adding": "சேர்க்கிறது...",
+        "edit": "திருத்து",
+        "delete": "நீக்கு",
+        "save": "சேமி",
+        "cancel": "ரத்து",
+        "noFunctions": "நிகழ்வு வகைகள் இல்லை.",
+        "englishPlaceholder": "எ.கா. Marriage",
+        "tamilPlaceholder": "எ.கா. திருமணம்"
+    },
+    "settings": {
+        "title": "⚙️ தள அமைப்புகள்",
+        "subtitle": "ரசீது மற்றும் பிராண்டிங் உள்ளமை",
+        "phone": "தொலைபேசி எண்",
+        "brandName": "பிராண்ட் பெயர்",
+        "brandContact": "பிராண்ட் தொடர்பு",
+        "receiptText": "ரசீது கூடுதல் உரை",
+        "logo": "தள லோகோ",
+        "uploadLogo": "லோகோ பதிவேற்று",
+        "saveSettings": "💾 அமைப்புகள் சேமி",
+        "saved": "அமைப்புகள் சேமிக்கப்பட்டன!"
+    },
+    "export": {
+        "downloadPdf": "📄 PDF பதிவிறக்கு",
+        "downloadExcel": "📊 Excel பதிவிறக்கு",
+        "generating": "⏳ உருவாக்குகிறது..."
+    },
+    "typist": {
+        "manageTypists": "👤 டைபிஸ்ட் நிர்வாகம்",
+        "addTypist": "டைபிஸ்ட் சேர்",
+        "name": "பெயர்",
+        "code": "குறியீடு (விருப்பம்)",
+        "remove": "நீக்கு",
+        "filterByTypist": "டைபிஸ்ட் வடிகட்டு",
+        "allTypists": "அனைத்து டைபிஸ்ட்கள்"
+    },
+    "table": {
+        "serial": "#",
+        "receipt": "ரசீது #",
+        "donorName": "நன்கொடையாளர் பெயர்",
+        "place": "இடம்",
+        "amount": "தொகை (₹)",
+        "typist": "டைபிஸ்ட்"
+    }
+}

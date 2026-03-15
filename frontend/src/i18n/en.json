@@ -1,0 +1,129 @@
+{
+    "app": {
+        "title": "Moi Application",
+        "subtitle": "Gift Contribution Tracking"
+    },
+    "nav": {
+        "newEvent": "New Event",
+        "admin": "Admin",
+        "adminPanel": "Admin Panel",
+        "logout": "Logout",
+        "functions": "Functions",
+        "settings": "Settings"
+    },
+    "home": {
+        "heroTitle": "Gift Contribution\nTracking",
+        "heroSubtitle": "Create an event and start collecting gift records from your guests.",
+        "createEvent": "Create Event",
+        "functionType": "Function Type",
+        "person1": "Person 1 Name",
+        "person2": "Person 2 Name",
+        "person1Placeholder": "e.g. Arjun Kumar",
+        "person2Placeholder": "e.g. Priya Sharma",
+        "location": "Location",
+        "locationPlaceholder": "e.g. Madurai, Tamil Nadu",
+        "phone": "Phone Number",
+        "phonePlaceholder": "e.g. +91 98765 43210",
+        "eventDate": "Event Date",
+        "startCollection": "🎊 Start Gift Collection",
+        "creating": "Creating..."
+    },
+    "gifts": {
+        "addGift": "➕ Add Gift Entry",
+        "donorName": "Donor Name",
+        "donorNamePlaceholder": "e.g. Ravi Kumar",
+        "place": "Place",
+        "placePlaceholder": "e.g. Chennai",
+        "amount": "Amount (₹)",
+        "amountPlaceholder": "e.g. 5000",
+        "selectTypist": "Select Typist",
+        "noTypist": "No Typist",
+        "saveGift": "💾 Save Gift",
+        "saving": "Saving...",
+        "giftRecords": "Gift Records",
+        "totalGiftAmount": "🏆 Total Gift Amount",
+        "noGiftsYet": "No gifts recorded yet. Add the first one!",
+        "createAnother": "← Create Another Event",
+        "gifts": "gifts",
+        "total": "Total",
+        "denomination": "Denomination",
+        "quantity": "Quantity",
+        "addDenomination": "+ Add Row",
+        "denominations": "Denominations"
+    },
+    "receipt": {
+        "contributingDetails": "Contributing Details",
+        "totalPrice": "Total Price",
+        "receiptNo": "Receipt #",
+        "typist": "Typist",
+        "printReceipt": "🖨️ Print Receipt"
+    },
+    "admin": {
+        "login": "🔐 Admin Login",
+        "loginSubtitle": "Access the management panel",
+        "username": "Username",
+        "password": "Password",
+        "loginBtn": "🔑 Login",
+        "loggingIn": "Logging in...",
+        "defaultCreds": "Default: admin / admin123",
+        "dashboard": "🎊 Admin Dashboard",
+        "dashboardSubtitle": "Manage all events and gift records",
+        "searchPlaceholder": "Search by name, location...",
+        "search": "🔍 Search",
+        "clear": "Clear",
+        "noEvents": "No events found.",
+        "createOne": "Create one!",
+        "viewGifts": "View Gifts →",
+        "backToDashboard": "← Back to Dashboard",
+        "addMoreGifts": "➕ Add More Gifts"
+    },
+    "functions": {
+        "title": "📋 Function Management",
+        "subtitle": "Add and manage event types",
+        "englishName": "English Name",
+        "tamilName": "Tamil Name",
+        "addFunction": "➕ Add Function",
+        "adding": "Adding...",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "noFunctions": "No function types found.",
+        "englishPlaceholder": "e.g. Marriage",
+        "tamilPlaceholder": "e.g. திருமணம்"
+    },
+    "settings": {
+        "title": "⚙️ Site Settings",
+        "subtitle": "Configure receipt and branding",
+        "phone": "Phone Number",
+        "brandName": "Brand Name",
+        "brandContact": "Brand Contact",
+        "receiptText": "Receipt Additional Text",
+        "logo": "Site Logo",
+        "uploadLogo": "Upload Logo",
+        "saveSettings": "💾 Save Settings",
+        "saved": "Settings saved!"
+    },
+    "export": {
+        "downloadPdf": "📄 Download PDF",
+        "downloadExcel": "📊 Download Excel",
+        "generating": "⏳ Generating..."
+    },
+    "typist": {
+        "manageTypists": "👤 Manage Typists",
+        "addTypist": "Add Typist",
+        "name": "Name",
+        "code": "Code (optional)",
+        "remove": "Remove",
+        "filterByTypist": "Filter by Typist",
+        "allTypists": "All Typists"
+    },
+    "table": {
+        "serial": "#",
+        "receipt": "Receipt #",
+        "donorName": "Donor Name",
+        "place": "Place",
+        "amount": "Amount (₹)",
+        "typist": "Typist"
+    }
+}
