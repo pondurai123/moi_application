@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const pool = require('../db');
+const authMiddleware = require('../middleware/auth');
 
 // POST /api/weddings - Create a new event
 router.post(
     '/',
+    authMiddleware,
     [
         body('groomName').trim().notEmpty().withMessage('Person 1 name is required'),
         body('brideName').trim().notEmpty().withMessage('Person 2 name is required'),
@@ -42,7 +44,7 @@ router.post(
 );
 
 // GET /api/weddings - List all events with optional search
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const { search } = req.query;
     try {
         let query = `SELECT w.*, ft.nameEn as functionNameEn, ft.nameTa as functionNameTa
@@ -64,7 +66,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/weddings/:id - Get single event
-router.get('/:id', async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const [rows] = await pool.execute(
             `SELECT w.*, ft.nameEn as functionNameEn, ft.nameTa as functionNameTa

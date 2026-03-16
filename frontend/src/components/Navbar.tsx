@@ -1,12 +1,27 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 import LanguageToggle from './LanguageToggle';
+import client from '../api/client';
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useLanguage();
     const isAdmin = !!localStorage.getItem('adminToken');
+    const [siteName, setSiteName] = useState<string>('');
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await client.get('/settings');
+                setSiteName(res.data.brandName || 'Moi');
+            } catch {
+                setSiteName('Moi');
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('adminToken');
@@ -17,16 +32,18 @@ export default function Navbar() {
         <nav className="navbar">
             <div className="navbar-inner">
                 <Link to="/" className="navbar-brand">
-                    <span className="emoji">💍</span>
-                    {t.app.title}
+                    {siteName}
                 </Link>
                 <div className="navbar-links">
                     <LanguageToggle />
                     <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-                        {t.nav.newEvent}
+                        {t.marketing.home}
                     </Link>
                     {isAdmin ? (
                         <>
+                            <Link to="/admin/events/new" className={location.pathname === '/admin/events/new' ? 'active' : ''}>
+                                {t.nav.newEvent}
+                            </Link>
                             <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>
                                 {t.nav.adminPanel}
                             </Link>
@@ -39,7 +56,12 @@ export default function Navbar() {
                             <button onClick={handleLogout}>{t.nav.logout}</button>
                         </>
                     ) : (
-                        <Link to="/admin/login">{t.nav.admin}</Link>
+                        <>
+                            <a href="/#functions">{t.marketing.functionsTitleTa}</a>
+                            <a href="/#features">{t.marketing.featuresTitleTa}</a>
+                            <a href="/#how">{t.marketing.howTitleTa}</a>
+                            <a href="/#contact">{t.marketing.contactTitle}</a>
+                        </>
                     )}
                 </div>
             </div>

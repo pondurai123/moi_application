@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { body, validationResult } = require('express-validator');
 const pool = require('../db');
+const authMiddleware = require('../middleware/auth');
 
 // Helper: generate next receipt number for this event
 async function getNextReceiptNumber(weddingId) {
@@ -15,6 +16,7 @@ async function getNextReceiptNumber(weddingId) {
 // POST /api/weddings/:id/gifts - Add a gift
 router.post(
     '/',
+    authMiddleware,
     [
         body('donorName').trim().notEmpty().withMessage('Donor name is required'),
         body('donorPlace').trim().notEmpty().withMessage('Donor place is required'),
@@ -67,7 +69,7 @@ router.post(
 );
 
 // GET /api/weddings/:id/gifts - List gifts with total, optional typist filter
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const weddingId = req.params.id;
     const { typistId } = req.query;
 
@@ -114,7 +116,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/weddings/:id/gifts/:giftId/receipt — Get receipt data
-router.get('/:giftId/receipt', async (req, res) => {
+router.get('/:giftId/receipt', authMiddleware, async (req, res) => {
     try {
         const [gifts] = await pool.execute(
             `SELECT g.*, t.name as typistName

@@ -31,9 +31,10 @@ interface ReceiptData {
 
 interface Props {
     data: ReceiptData | null;
+    hidden?: boolean;
 }
 
-const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
+const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data, hidden = false }, ref) => {
     const { lang } = useLanguage();
 
     if (!data) return null;
@@ -48,11 +49,16 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         hour: '2-digit', minute: '2-digit', hour12: true,
     });
 
-    // Receipt labels in Tamil (matching the sample)
     const labels = lang === 'ta' ? {
         title: 'மொய் ரசீது',
+        event: 'நிகழ்வு',
+        place: 'இடம்',
+        phone: 'தொலைபேசி',
         date: 'நாள்',
+        receiptNo: 'ரசீது',
         contributorDetails: 'பங்களிப்பாளர் விபரம்',
+        contributor: 'பெயர்',
+        placeLabel: 'ஊர்',
         contributionAmount: 'பங்களிப்பு தொகை',
         contributionDetails: 'பங்களிப்பு விபரம்',
         amountReceived: 'பெற்ற தொகை',
@@ -62,8 +68,14 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         contactTitle: 'தொடர்பு கொள்ள',
     } : {
         title: 'Moi Receipt',
+        event: 'Event',
+        place: 'Place',
+        phone: 'Phone',
         date: 'Date',
+        receiptNo: 'Receipt',
         contributorDetails: 'Contributor Details',
+        contributor: 'Contributor',
+        placeLabel: 'Place',
         contributionAmount: 'Contribution Amount',
         contributionDetails: 'Contribution Details',
         amountReceived: 'Amount Received',
@@ -75,20 +87,30 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
     const receiptStyle: React.CSSProperties = {
         width: '80mm',
-        padding: '8mm 4mm',
-        fontFamily: "'Inter', 'Noto Sans Tamil', Arial, sans-serif",
+        maxWidth: '80mm',
+        padding: '4mm',
+        fontFamily: "'Courier New', monospace",
         fontSize: '11px',
         color: '#000',
         background: '#fff',
-        position: 'fixed',
-        left: '-9999px',
-        top: 0,
         lineHeight: 1.4,
+        display: hidden ? 'none' : 'block',
+        margin: 0,
+        overflow: 'visible',
+        boxSizing: 'border-box',
     };
 
     const dividerStyle: React.CSSProperties = {
         borderTop: '1px dashed #000',
-        margin: '8px 0',
+        margin: '4px 0',
+        padding: 0,
+    };
+
+    const boxedStyle: React.CSSProperties = {
+        border: '1px solid #000',
+        borderRadius: '0px',
+        padding: '4px',
+        marginBottom: '6px',
     };
 
     const centerBold: React.CSSProperties = {
@@ -99,40 +121,25 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
     return (
         <div ref={ref} className="receipt-print" style={receiptStyle}>
             {/* ===== HEADER ===== */}
-            <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+            <div style={{ ...boxedStyle, textAlign: 'center', marginBottom: '10px' }}>
                 {settings.logoUrl && (
-                    <img src={settings.logoUrl} alt="Logo" style={{ maxWidth: '35mm', maxHeight: '15mm', marginBottom: '6px' }} />
+                    <img src={settings.logoUrl} alt="Logo" style={{ maxWidth: '32mm', maxHeight: '14mm', marginBottom: '6px', objectFit: 'contain' }} />
                 )}
                 <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.5px', marginBottom: '8px' }}>
                     {labels.title}
                 </div>
+                <div style={{ fontSize: '12px', fontWeight: 700 }}>{event.groomName} & {event.brideName}</div>
+                <div style={{ fontSize: '11px', marginTop: '4px' }}>{functionName}</div>
+                <div style={{ fontSize: '10px', marginTop: '4px' }}>{event.location}</div>
+                {phone && <div style={{ fontSize: '10px', marginTop: '2px' }}>{phone}</div>}
             </div>
-
-            <div style={dividerStyle} />
-
-            {/* ===== EVENT HOSTS ===== */}
-            <div style={{ ...centerBold, fontSize: '13px', lineHeight: 1.5, marginBottom: '4px' }}>
-                <div>திருமிகு {event.groomName} –</div>
-                <div>திருமதி {event.brideName}</div>
-            </div>
-            <div style={{ textAlign: 'center', fontSize: '11px', fontWeight: 600 }}>
-                ({functionName})
-            </div>
-            <div style={{ textAlign: 'center', fontSize: '11px', marginTop: '4px' }}>
-                {event.location}
-            </div>
-            {phone && (
-                <div style={{ textAlign: 'center', fontSize: '11px' }}>
-                    📱 {phone}
-                </div>
-            )}
 
             <div style={dividerStyle} />
 
             {/* ===== DATE & RECEIPT # ===== */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', padding: '2px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '10px', padding: '2px 0', gap: '8px' }}>
                 <span>{labels.date}: {dateStr}</span>
-                <span style={{ fontWeight: 800, fontSize: '15px' }}>#{gift.receiptNumber}</span>
+                <span style={{ fontWeight: 800, fontSize: '13px', textAlign: 'right' }}>{labels.receiptNo}: #{gift.receiptNumber}</span>
             </div>
 
             <div style={dividerStyle} />
@@ -141,9 +148,11 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             <div style={{ ...centerBold, fontSize: '12px', textDecoration: 'underline', marginBottom: '6px' }}>
                 {labels.contributorDetails}
             </div>
-            <div style={{ ...centerBold, fontSize: '15px', marginBottom: '2px' }}>{gift.donorName}</div>
-            <div style={{ textAlign: 'center', fontSize: '11px', marginBottom: '4px' }}>{gift.donorPlace}</div>
-            <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700 }}>
+            <div style={{ ...boxedStyle, marginBottom: '0' }}>
+                <div style={{ fontSize: '11px', marginBottom: '2px' }}>{labels.contributor}: {gift.donorName}</div>
+                <div style={{ fontSize: '11px', marginBottom: '4px' }}>{labels.placeLabel}: {gift.donorPlace}</div>
+            </div>
+            <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700, marginTop: '8px' }}>
                 {labels.contributionAmount}: ₹{Number(gift.amount).toFixed(2)}
             </div>
 
@@ -156,12 +165,19 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                         {labels.contributionDetails}
                     </div>
                     <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse', marginBottom: '6px' }}>
+                        <thead>
+                            <tr>
+                                <th style={{ textAlign: 'left', paddingBottom: '4px', borderBottom: '1px solid #000' }}>₹</th>
+                                <th style={{ textAlign: 'center', paddingBottom: '4px', borderBottom: '1px solid #000' }}>Qty</th>
+                                <th style={{ textAlign: 'right', paddingBottom: '4px', borderBottom: '1px solid #000' }}>Total</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {gift.denominations.map((d, i) => (
                                 <tr key={i}>
-                                    <td style={{ padding: '2px 0', textAlign: 'left', width: '30%' }}>₹{d.denomination}</td>
-                                    <td style={{ padding: '2px 0', textAlign: 'center', width: '20%' }}>{d.quantity}</td>
-                                    <td style={{ padding: '2px 0', textAlign: 'right', fontWeight: 700, width: '50%' }}>
+                                    <td style={{ padding: '4px 0', textAlign: 'left', width: '30%', borderBottom: '1px dotted #777' }}>₹{d.denomination}</td>
+                                    <td style={{ padding: '4px 0', textAlign: 'center', width: '20%', borderBottom: '1px dotted #777' }}>x {d.quantity}</td>
+                                    <td style={{ padding: '4px 0', textAlign: 'right', fontWeight: 700, width: '50%', borderBottom: '1px dotted #777' }}>
                                         ₹{(d.denomination * d.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                     </td>
                                 </tr>
@@ -176,8 +192,8 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             )}
 
             {/* ===== TOTAL ===== */}
-            <div style={{ ...centerBold, fontSize: '14px', margin: '4px 0' }}>
-                {labels.totalContribution}: Rs. {Number(gift.amount).toFixed(2)}
+            <div style={{ ...centerBold, fontSize: '13px', margin: '4px 0', border: '1.5px solid #000', borderRadius: '0px', padding: '6px 4px', background: '#fff' }}>
+                {labels.totalContribution}: ₹{Number(gift.amount).toFixed(2)}
             </div>
 
             <div style={dividerStyle} />

@@ -12,6 +12,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminWeddingDetailPage from './pages/AdminWeddingDetailPage';
 import AdminFunctionsPage from './pages/AdminFunctionsPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
+import AdminEventCreatePage from './pages/AdminEventCreatePage';
+import PublicContentPage from './pages/PublicContentPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('adminToken');
@@ -26,9 +28,14 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/collect/:weddingId" element={<GiftCollectionPage />} />
+          <Route path="/about" element={<PublicContentPage pageType="about" titleKey="marketing.aboutTitle" subtitleKey="marketing.aboutSubtitle" fallbackKey="marketing.aboutFallback" />} />
+          <Route path="/terms" element={<PublicContentPage pageKey="termsContent" titleKey="marketing.termsTitle" subtitleKey="marketing.termsSubtitle" fallbackKey="marketing.termsFallback" />} />
+          <Route path="/privacy" element={<PublicContentPage pageKey="privacyContent" titleKey="marketing.privacyTitle" subtitleKey="marketing.privacySubtitle" fallbackKey="marketing.privacyFallback" />} />
+          <Route path="/contact" element={<PublicContentPage pageType="contact" titleKey="marketing.contactTitle" subtitleKey="marketing.contactSubtitle" fallbackKey="marketing.contactFallback" />} />
+          <Route path="/collect/:weddingId" element={<ProtectedRoute><GiftCollectionPage /></ProtectedRoute>} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+          <Route path="/admin/events/new" element={<ProtectedRoute><AdminEventCreatePage /></ProtectedRoute>} />
           <Route path="/admin/weddings/:id" element={<ProtectedRoute><AdminWeddingDetailPage /></ProtectedRoute>} />
           <Route path="/admin/functions" element={<ProtectedRoute><AdminFunctionsPage /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />

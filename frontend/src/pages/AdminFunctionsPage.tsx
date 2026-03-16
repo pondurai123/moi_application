@@ -17,7 +17,7 @@ interface FunctionForm {
 }
 
 export default function AdminFunctionsPage() {
-    const { lang, t } = useLanguage();
+    const { t } = useLanguage();
     const [functions, setFunctions] = useState<FunctionType[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState<number | null>(null);

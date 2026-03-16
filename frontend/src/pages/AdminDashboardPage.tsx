@@ -40,6 +40,10 @@ export default function AdminDashboardPage() {
                     <p>{t.admin.dashboardSubtitle}</p>
                 </div>
 
+                <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Link to="/admin/events/new" className="btn btn-primary btn-sm">{t.admin.createEventCta}</Link>
+                </div>
+
                 <form className="search-bar" onSubmit={handleSearch}>
                     <input className="form-control" placeholder={t.admin.searchPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
                     <button type="submit" className="btn btn-primary">{t.admin.search}</button>
@@ -53,7 +57,7 @@ export default function AdminDashboardPage() {
                 {loading ? <div className="spinner" /> : weddings.length === 0 ? (
                     <div className="empty-state">
                         <div className="icon">💍</div>
-                        <p>{t.admin.noEvents} <Link to="/" style={{ color: 'var(--primary)' }}>{t.admin.createOne}</Link></p>
+                        <p>{t.admin.noEvents} <Link to="/admin/events/new" style={{ color: 'var(--primary)' }}>{t.admin.createOne}</Link></p>
                     </div>
                 ) : (
                     <div className="weddings-grid">

@@ -105,20 +105,90 @@ export default function GiftCollectionPage() {
 
     const printReceipt = () => {
         if (!receiptRef.current) return;
-        const printWindow = window.open('', '_blank', 'width=320,height=600');
+        const printWindow = window.open('', '_blank', 'width=360,height=600');
         if (!printWindow) { toast.error('Please allow popups to print receipts'); return; }
         printWindow.document.write(`
-      <html><head><title>Receipt</title>
-      <style>
-        @page { size: 80mm auto; margin: 0; }
-        body { margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
-      </style>
-      </head><body>${receiptRef.current.innerHTML}</body></html>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>80mm Thermal Receipt</title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+            padding: 0;
+          }
+          
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          html, body {
+            width: 80mm;
+            height: auto;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+          }
+          
+          body {
+            display: block;
+          }
+          
+          .receipt-print {
+            width: 80mm !important;
+            max-width: 80mm !important;
+            padding: 4mm !important;
+            margin: 0 !important;
+            display: block !important;
+            color: #000 !important;
+            background: #fff !important;
+            overflow: visible !important;
+          }
+          
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            padding: 0;
+          }
+          
+          td, th {
+            padding: 2px 4px;
+            text-align: left;
+          }
+          
+          img {
+            display: block;
+            max-width: 32mm;
+            height: auto;
+            margin: 0 auto;
+          }
+          
+          div {
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+      </head>
+      <body>${receiptRef.current.innerHTML}</body>
+      </html>
     `);
         printWindow.document.close();
         printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+        setTimeout(() => {
+            printWindow.print();
+            // Keep window open briefly for printing to complete
+            setTimeout(() => printWindow.close(), 1000);
+        }, 300);
     };
 
     const addTypist = async () => {
@@ -139,7 +209,7 @@ export default function GiftCollectionPage() {
     return (
         <div className="page">
             <div className="container">
-                <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>
+                <Link to="/admin/events/new" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>
                     {t.gifts.createAnother}
                 </Link>
 
@@ -267,7 +337,7 @@ export default function GiftCollectionPage() {
                 </div>
 
                 {/* Hidden receipt for printing */}
-                <ReceiptPrint ref={receiptRef} data={receiptData} />
+                <ReceiptPrint ref={receiptRef} data={receiptData} hidden />
             </div>
         </div>
     );

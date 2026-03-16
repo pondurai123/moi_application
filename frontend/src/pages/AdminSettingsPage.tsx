@@ -11,6 +11,12 @@ export default function AdminSettingsPage() {
         brandContact: '',
         receiptAdditionalText: '',
         logoUrl: '',
+        aboutUsContentEn: '',
+        aboutUsContentTa: '',
+        termsContent: '',
+        privacyContent: '',
+        contactUsContentEn: '',
+        contactUsContentTa: '',
     });
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -110,10 +116,11 @@ export default function AdminSettingsPage() {
                     {/* Brand Contact */}
                     <div className="form-group">
                         <label>{t.settings.brandContact}</label>
-                        <input
+                        <textarea
                             className="form-control"
                             value={settings.brandContact}
                             onChange={(e) => setSettings({ ...settings, brandContact: e.target.value })}
+                            rows={3}
                         />
                     </div>
 
@@ -125,6 +132,66 @@ export default function AdminSettingsPage() {
                             rows={3}
                             value={settings.receiptAdditionalText}
                             onChange={(e) => setSettings({ ...settings, receiptAdditionalText: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.aboutUsEnglish}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.aboutUsContentEn}
+                            onChange={(e) => setSettings({ ...settings, aboutUsContentEn: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.aboutUsTamil}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.aboutUsContentTa}
+                            onChange={(e) => setSettings({ ...settings, aboutUsContentTa: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.terms}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.termsContent}
+                            onChange={(e) => setSettings({ ...settings, termsContent: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.privacy}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.privacyContent}
+                            onChange={(e) => setSettings({ ...settings, privacyContent: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.contactUsEnglish}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.contactUsContentEn}
+                            onChange={(e) => setSettings({ ...settings, contactUsContentEn: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t.settings.contactUsTamil}</label>
+                        <textarea
+                            className="form-control"
+                            rows={5}
+                            value={settings.contactUsContentTa}
+                            onChange={(e) => setSettings({ ...settings, contactUsContentTa: e.target.value })}
                         />
                     </div>
 

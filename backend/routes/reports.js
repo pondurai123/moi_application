@@ -3,6 +3,7 @@ const router = express.Router({ mergeParams: true });
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const pool = require('../db');
+const authMiddleware = require('../middleware/auth');
 
 async function getEventAndGifts(eventId, typistId) {
     const [events] = await pool.execute(
@@ -48,7 +49,7 @@ async function getEventAndGifts(eventId, typistId) {
 }
 
 // GET /api/weddings/:id/report/pdf
-router.get('/pdf', async (req, res) => {
+router.get('/pdf', authMiddleware, async (req, res) => {
     try {
         const data = await getEventAndGifts(req.params.id, req.query.typistId);
         if (!data) return res.status(404).json({ error: 'Event not found' });
@@ -144,7 +145,7 @@ router.get('/pdf', async (req, res) => {
 });
 
 // GET /api/weddings/:id/report/excel
-router.get('/excel', async (req, res) => {
+router.get('/excel', authMiddleware, async (req, res) => {
     try {
         const data = await getEventAndGifts(req.params.id, req.query.typistId);
         if (!data) return res.status(404).json({ error: 'Event not found' });

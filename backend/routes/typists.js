@@ -7,6 +7,7 @@ const authMiddleware = require('../middleware/auth');
 // POST /api/events/:id/typists — Add typist to event
 router.post(
     '/',
+    authMiddleware,
     [
         body('name').trim().notEmpty().withMessage('Typist name is required'),
         body('code').optional().trim(),
@@ -36,7 +37,7 @@ router.post(
 );
 
 // GET /api/events/:id/typists — List typists for event
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const eventId = req.params.id;
     try {
         const [rows] = await pool.execute(
