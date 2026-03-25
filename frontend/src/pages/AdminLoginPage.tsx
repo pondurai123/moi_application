@@ -17,6 +17,7 @@ export default function AdminLoginPage() {
         try {
             const res = await client.post('/admin/login', data);
             localStorage.setItem('adminToken', res.data.token);
+            localStorage.setItem('adminUser', JSON.stringify({ username: res.data.username, role: res.data.role }));
             toast.success(`Welcome back, ${res.data.username}! 👋`);
             navigate('/admin');
         } catch (err: any) { toast.error(err.response?.data?.error || 'Login failed'); }

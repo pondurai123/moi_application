@@ -12,8 +12,7 @@ interface FunctionType {
 }
 
 interface EventForm {
-    groomName: string;
-    brideName: string;
+    functionName: string;
     location: string;
     phoneNumber: string;
     weddingDate: string;
@@ -64,25 +63,14 @@ export default function AdminEventCreatePage() {
                             {errors.functionTypeId && <p className="error-msg">{t.home.functionType} is required</p>}
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>{t.home.person1}</label>
-                                <input
-                                    className={`form-control ${errors.groomName ? 'error' : ''}`}
-                                    placeholder={t.home.person1Placeholder}
-                                    {...register('groomName', { required: true })}
-                                />
-                                {errors.groomName && <p className="error-msg">{t.home.person1} is required</p>}
-                            </div>
-                            <div className="form-group">
-                                <label>{t.home.person2}</label>
-                                <input
-                                    className={`form-control ${errors.brideName ? 'error' : ''}`}
-                                    placeholder={t.home.person2Placeholder}
-                                    {...register('brideName', { required: true })}
-                                />
-                                {errors.brideName && <p className="error-msg">{t.home.person2} is required</p>}
-                            </div>
+                        <div className="form-group">
+                            <label>{t.home.functionName}</label>
+                            <input
+                                className={`form-control ${errors.functionName ? 'error' : ''}`}
+                                placeholder={t.home.functionNamePlaceholder}
+                                {...register('functionName', { required: true })}
+                            />
+                            {errors.functionName && <p className="error-msg">{t.home.functionName} is required</p>}
                         </div>
 
                         <div className="form-row">

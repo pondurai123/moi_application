@@ -1,5 +1,6 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { getFullAssetUrl } from '../api/client';
 
 interface ReceiptData {
     gift: {
@@ -36,13 +37,41 @@ interface Props {
 
 const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data, hidden = false }, ref) => {
     const { lang } = useLanguage();
+    const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+
+    // Convert logo URL to data URL to ensure it works in print window
+    useEffect(() => {
+        if (data?.settings?.logoUrl) {
+            const logoUrl = getFullAssetUrl(data.settings.logoUrl);
+            // If already a data URL, use it directly
+            if (logoUrl.startsWith('data:')) {
+                setLogoDataUrl(logoUrl);
+                return;
+            }
+            // Otherwise, fetch and convert to data URL
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0);
+                    setLogoDataUrl(canvas.toDataURL('image/png'));
+                }
+            };
+            img.onerror = () => {
+                // If image fails to load, just skip it
+                setLogoDataUrl(null);
+            };
+            img.src = logoUrl;
+        }
+    }, [data?.settings?.logoUrl]);
 
     if (!data) return null;
     const { gift, event, settings } = data;
 
-    const functionName = lang === 'ta'
-        ? (event.functionNameTa || event.functionNameEn || 'நிகழ்வு')
-        : (event.functionNameEn || 'Event');
     const phone = event.phoneNumber || settings.phone || '';
     const dateStr = new Date(gift.createdAt).toLocaleString('en-IN', {
         day: '2-digit', month: '2-digit', year: 'numeric',
@@ -86,10 +115,10 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data, hidden = false }
     };
 
     const receiptStyle: React.CSSProperties = {
-        width: '80mm',
-        maxWidth: '80mm',
-        padding: '4mm',
-        fontFamily: "'Courier New', monospace",
+        width: '72mm',
+        maxWidth: '72mm',
+        padding: '3mm',
+        fontFamily: "'Noto Sans Tamil', 'Lohit Tamil', 'Samyak Tamil', 'Latha', 'Vijaya', 'Tamil Sangam MN', 'InaiMathi', 'Nirmala UI', sans-serif",
         fontSize: '11px',
         color: '#000',
         background: '#fff',
@@ -122,14 +151,15 @@ const ReceiptPrint = forwardRef<HTMLDivElement, Props>(({ data, hidden = false }
         <div ref={ref} className="receipt-print" style={receiptStyle}>
             {/* ===== HEADER ===== */}
             <div style={{ ...boxedStyle, textAlign: 'center', marginBottom: '10px' }}>
-                {settings.logoUrl && (
-                    <img src={settings.logoUrl} alt="Logo" style={{ maxWidth: '32mm', maxHeight: '14mm', marginBottom: '6px', objectFit: 'contain' }} />
+                {logoDataUrl && (
+                    <img src={logoDataUrl} alt="Logo" style={{ maxWidth: '28mm', maxHeight: '14mm', marginBottom: '6px', objectFit: 'contain' }} />
                 )}
                 <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.5px', marginBottom: '8px' }}>
                     {labels.title}
                 </div>
-                <div style={{ fontSize: '12px', fontWeight: 700 }}>{event.groomName} & {event.brideName}</div>
-                <div style={{ fontSize: '11px', marginTop: '4px' }}>{functionName}</div>
+                <div style={{ fontSize: '12px', fontWeight: 700 }}>
+                    {event.groomName}
+                </div>
                 <div style={{ fontSize: '10px', marginTop: '4px' }}>{event.location}</div>
                 {phone && <div style={{ fontSize: '10px', marginTop: '2px' }}>{phone}</div>}
             </div>

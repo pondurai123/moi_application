@@ -27,9 +27,10 @@ CREATE TABLE IF NOT EXISTS admin_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(100) NOT NULL UNIQUE,
   passwordHash VARCHAR(255) NOT NULL,
+  role ENUM('SUPER_ADMIN', 'ADMIN') DEFAULT 'ADMIN',
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Default admin: username=admin, password=admin123
-INSERT IGNORE INTO admin_users (username, passwordHash)
-VALUES ('admin', '$2a$10$JwoXrb3JVHoaX6EbH67J7uQDi4JlpGLD6THpIcLN543ypDDRv.IHa');
+-- Default super admin: username=admin, password=admin123
+INSERT IGNORE INTO admin_users (username, passwordHash, role)
+VALUES ('admin', '$2a$10$JwoXrb3JVHoaX6EbH67J7uQDi4JlpGLD6THpIcLN543ypDDRv.IHa', 'SUPER_ADMIN');

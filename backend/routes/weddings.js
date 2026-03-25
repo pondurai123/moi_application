@@ -9,8 +9,7 @@ router.post(
     '/',
     authMiddleware,
     [
-        body('groomName').trim().notEmpty().withMessage('Person 1 name is required'),
-        body('brideName').trim().notEmpty().withMessage('Person 2 name is required'),
+        body('functionName').trim().notEmpty().withMessage('Function name/description is required'),
         body('location').trim().notEmpty().withMessage('Location is required'),
         body('weddingDate').isDate().withMessage('Valid date is required'),
         body('functionTypeId').optional().isInt({ min: 1 }),
@@ -22,11 +21,11 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { groomName, brideName, location, weddingDate, functionTypeId, phoneNumber } = req.body;
+        const { functionName, location, weddingDate, functionTypeId, phoneNumber } = req.body;
         try {
             const [result] = await pool.execute(
                 'INSERT INTO weddings (functionTypeId, groomName, brideName, location, phoneNumber, weddingDate) VALUES (?, ?, ?, ?, ?, ?)',
-                [functionTypeId || 1, groomName, brideName, location, phoneNumber || '', weddingDate]
+                [functionTypeId || 1, functionName, '', location, phoneNumber || '', weddingDate]
             );
             const [rows] = await pool.execute(
                 `SELECT w.*, ft.nameEn as functionNameEn, ft.nameTa as functionNameTa
@@ -52,9 +51,9 @@ router.get('/', authMiddleware, async (req, res) => {
                  LEFT JOIN function_types ft ON w.functionTypeId = ft.id`;
         let params = [];
         if (search) {
-            query += ' WHERE w.groomName LIKE ? OR w.brideName LIKE ? OR w.location LIKE ? OR ft.nameEn LIKE ?';
+            query += ' WHERE w.groomName LIKE ? OR w.location LIKE ? OR ft.nameEn LIKE ?';
             const like = `%${search}%`;
-            params = [like, like, like, like];
+            params = [like, like, like];
         }
         query += ' ORDER BY w.createdAt DESC';
         const [rows] = await pool.execute(query, params);

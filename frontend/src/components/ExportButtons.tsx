@@ -18,7 +18,16 @@ export default function ExportButtons({ weddingId, typistId }: Props) {
         try {
             let url = `/api/weddings/${weddingId}/report/${type}`;
             if (typistId) url += `?typistId=${typistId}`;
-            const response = await fetch(url);
+            
+            // Get token from localStorage
+            const token = localStorage.getItem('adminToken');
+            
+            // Fetch with Authorization header
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!response.ok) throw new Error('Download failed');
 
             // Try to get filename from Content-Disposition header

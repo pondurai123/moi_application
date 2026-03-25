@@ -55,13 +55,13 @@ body {
 }
 
 .navbar-inner {
-  max-width: 1100px;
+  max-width: 1240px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  gap: 16px;
+  gap: 20px;
 }
 
 .navbar-brand {
@@ -76,6 +76,7 @@ body {
   letter-spacing: 0.05em;
   transition: all 0.3s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .navbar-brand:hover {
@@ -88,11 +89,31 @@ body {
   -webkit-text-fill-color: initial;
 }
 
+.navbar-menu-toggle {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  gap: 5px;
+  padding: 8px;
+}
+
+.navbar-menu-toggle span {
+  width: 24px;
+  height: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
@@ -100,7 +121,7 @@ body {
 .navbar-links button {
   color: var(--text-muted);
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 500;
@@ -109,6 +130,10 @@ body {
   border: none;
   cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .navbar-links a:hover,
@@ -1298,14 +1323,42 @@ textarea.form-control {
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
+  .navbar-menu-toggle {
+    display: flex;
+  }
+
   .navbar-links {
-    gap: 4px;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: rgba(15, 10, 30, 0.95);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    gap: 0;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: none;
+    flex-wrap: nowrap;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .navbar-links.open {
+    display: flex;
   }
 
   .navbar-links a,
   .navbar-links button {
-    padding: 6px 10px;
-    font-size: 0.8rem;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    text-align: left;
+    border-radius: 6px;
+  }
+
+  .navbar-inner {
+    height: 64px;
   }
 
   .page {
@@ -1339,6 +1392,38 @@ textarea.form-control {
 
   .marketing-flow,
   .marketing-hero-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gift-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.gift-denomination-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gift-entry-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gift-submit-btn {
+  min-width: 240px;
+}
+
+@media (max-width: 768px) {
+  .gift-entry-grid {
     grid-template-columns: 1fr;
   }
 }

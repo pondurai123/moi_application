@@ -1,9 +1,22 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
-const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 const pool = require('../db');
 const authMiddleware = require('../middleware/auth');
+
+const REPORT_FONT_CANDIDATES = [
+    '/usr/share/fonts/truetype/freefont/FreeSerif.ttf',
+    '/usr/share/fonts/truetype/samyak-fonts/Samyak-Tamil.ttf',
+    '/usr/share/fonts/truetype/lohit-tamil/Lohit-Tamil.ttf',
+    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf',
+];
+
+function resolveReportFontPath() {
+    return REPORT_FONT_CANDIDATES.find((fontPath) => fs.existsSync(fontPath)) || null;
+}
 
 async function getEventAndGifts(eventId, typistId) {
     const [events] = await pool.execute(
@@ -19,7 +32,7 @@ async function getEventAndGifts(eventId, typistId) {
                    FROM gifts g
                    LEFT JOIN typists t ON g.typistId = t.id
                    WHERE g.weddingId = ?`;
-    let params = [eventId];
+    const params = [eventId];
     if (typistId) {
         giftQuery += ' AND g.typistId = ?';
         params.push(typistId);
@@ -34,7 +47,7 @@ async function getEventAndGifts(eventId, typistId) {
     });
 
     let totalQuery = 'SELECT COALESCE(SUM(amount), 0) as totalAmount FROM gifts WHERE weddingId = ?';
-    let totalParams = [eventId];
+    const totalParams = [eventId];
     if (typistId) {
         totalQuery += ' AND typistId = ?';
         totalParams.push(typistId);
@@ -48,122 +61,112 @@ async function getEventAndGifts(eventId, typistId) {
     };
 }
 
-// GET /api/weddings/:id/report/pdf
 router.get('/pdf', authMiddleware, async (req, res) => {
     try {
         const data = await getEventAndGifts(req.params.id, req.query.typistId);
         if (!data) return res.status(404).json({ error: 'Event not found' });
 
         const { event, gifts, totalAmount } = data;
-        const doc = new PDFDocument({ margin: 50 });
+        const reportFontPath = resolveReportFontPath();
+        if (!reportFontPath) {
+            return res.status(500).json({ error: 'No Unicode report font found on server' });
+        }
 
-        const functionName = event.functionNameEn || 'Event';
-
-        const sanitize = (str) => str.replace(/[^a-z0-9\u0B80-\u0BFF]/gi, '_');
-        const safeGroom = sanitize(event.groomName);
-        const safeBride = sanitize(event.brideName);
+        const sanitize = (str) => String(str || '').replace(/[^a-z0-9\u0B80-\u0BFF]/gi, '_');
+        const safeFunction = sanitize(event.groomName);
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const filename = `${functionName}_${safeGroom}_${safeBride}_${timestamp}.pdf`;
+        const filename = `Gift_Report_${safeFunction}_${timestamp}.pdf`;
+
+        const doc = new PDFDocument({
+            bufferPages: true,
+            margin: 40,
+        });
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader(
-            'Content-Disposition',
-            `attachment; filename="${encodeURIComponent(filename)}"`
-        );
-        doc.pipe(res);
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
 
-        // ---- Header ----
-        doc.fontSize(22).fillColor('#6B21A8').text(`${functionName} Gift Report`, { align: 'center' });
-        doc.moveDown(0.5);
-        doc.fontSize(14).fillColor('#1F2937');
-        doc.text(`${event.groomName}  &  ${event.brideName}`, { align: 'center' });
-        doc.text(`Location: ${event.location}`, { align: 'center' });
+        doc.pipe(res);
+        doc.registerFont('ReportBody', reportFontPath);
+        doc.registerFont('ReportBold', reportFontPath);
+
+        doc.fontSize(24).font('ReportBold').fillColor('#6B21A8').text('Gift Report', { align: 'center' });
+        doc.moveDown(0.3);
+        doc.fontSize(14).font('ReportBold').fillColor('#1F2937').text(event.groomName || '', { align: 'center' });
+        doc.moveDown(0.2);
+
+        doc.fontSize(10).font('ReportBody').fillColor('#4B5563');
+        doc.text(`Location: ${event.location || '-'}`, { align: 'center' });
         if (event.phoneNumber) doc.text(`Phone: ${event.phoneNumber}`, { align: 'center' });
         doc.text(`Date: ${new Date(event.weddingDate).toLocaleDateString('en-IN')}`, { align: 'center' });
-        if (req.query.typistId) {
-            const typistName = gifts.length > 0 ? gifts[0].typistName : `Typist #${req.query.typistId}`;
-            doc.text(`Typist: ${typistName}`, { align: 'center' });
+        if (req.query.typistId && gifts.length > 0) {
+            doc.text(`Typist: ${gifts[0].typistName || 'Unknown'}`, { align: 'center' });
         }
-        doc.moveDown(1);
 
-        // ---- Table Header ----
+        doc.moveDown(0.5);
+        doc.strokeColor('#6B21A8').lineWidth(2).moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+        doc.moveDown(0.5);
+
         const tableTop = doc.y;
-        const colWidths = [30, 50, 140, 120, 100];
-        const colX = [50, 85, 140, 285, 410];
-        const rowHeight = 25;
+        const col1 = 45;
+        const col2 = 90;
+        const col3 = 200;
+        const col4 = 380;
+        const col5 = 520;
+        const rowHeight = 18;
 
-        const drawRow = (y, values, isHeader = false) => {
-            if (isHeader) {
-                doc.rect(50, y, 490, rowHeight).fill('#6B21A8');
-                doc.fillColor('#FFFFFF').fontSize(10);
-            } else {
-                doc.rect(50, y, 490, rowHeight).stroke('#E5E7EB');
-                doc.fillColor('#1F2937').fontSize(9);
-            }
-            values.forEach((val, i) => {
-                doc.text(String(val), colX[i] + 4, y + 7, { width: colWidths[i] - 8, lineBreak: false });
-            });
-        };
-
-        drawRow(tableTop, ['#', 'Receipt', 'Donor Name', 'Place', 'Amount (₹)'], true);
+        doc.rect(40, tableTop, 515, rowHeight).fill('#6B21A8');
+        doc.fontSize(10).font('ReportBold').fillColor('#FFFFFF');
+        doc.text('#', col1, tableTop + 3);
+        doc.text('Receipt', col2, tableTop + 3);
+        doc.text('Donor Name', col3, tableTop + 3);
+        doc.text('Place', col4, tableTop + 3);
+        doc.text('Amount (₹)', col5 - 40, tableTop + 3, { align: 'right' });
 
         let y = tableTop + rowHeight;
         gifts.forEach((gift, idx) => {
-            if (y > 700) {
-                doc.addPage();
-                y = 50;
-            }
-            if (idx % 2 === 0) {
-                doc.rect(50, y, 490, rowHeight).fill('#F9FAFB');
-                doc.fillColor('#1F2937').fontSize(9);
-            }
-            drawRow(y, [
-                idx + 1,
-                gift.receiptNumber || '-',
-                gift.donorName,
-                gift.donorPlace,
-                `₹${parseFloat(gift.amount).toLocaleString('en-IN')}`,
-            ]);
+            const bgColor = idx % 2 === 0 ? '#F9FAFB' : '#FFFFFF';
+            doc.rect(40, y, 515, rowHeight).fill(bgColor);
+            doc.font('ReportBody').fontSize(9).fillColor('#1F2937');
+            doc.text(String(idx + 1), col1, y + 3);
+            doc.text(gift.receiptNumber || '-', col2, y + 3);
+            doc.text(String(gift.donorName || '-').substring(0, 25), col3, y + 3, { width: 150 });
+            doc.text(String(gift.donorPlace || '-').substring(0, 20), col4, y + 3, { width: 120 });
+            doc.text(`₹${parseFloat(gift.amount).toLocaleString('en-IN')}`, col5 - 40, y + 3, { align: 'right' });
             y += rowHeight;
         });
 
-        // ---- Total Row ----
-        doc.rect(50, y, 490, rowHeight).fill('#EDE9FE');
-        doc.fillColor('#6B21A8').fontSize(11).font('Helvetica-Bold');
-        doc.text('TOTAL', colX[0] + 4, y + 7, { width: 330, lineBreak: false });
-        doc.text(`₹${totalAmount.toLocaleString('en-IN')}`, colX[4] + 4, y + 7, { width: colWidths[4] - 8, lineBreak: false });
+        doc.rect(40, y, 515, rowHeight).fill('#EDE9FE');
+        doc.font('ReportBold').fontSize(10).fillColor('#6B21A8');
+        doc.text('TOTAL', col3, y + 3);
+        doc.text(`₹${totalAmount.toLocaleString('en-IN')}`, col5 - 40, y + 3, { align: 'right' });
 
         doc.moveDown(2);
-        doc.fontSize(9).fillColor('#9CA3AF').font('Helvetica')
-            .text(`Generated on ${new Date().toLocaleString('en-IN')}`, { align: 'right' });
-
+        doc.fontSize(8).font('ReportBody').fillColor('#9CA3AF');
+        doc.text(`Generated on ${new Date().toLocaleString('en-IN')}`, { align: 'right' });
         doc.end();
     } catch (err) {
-        console.error(err);
+        console.error('PDF generation error:', err);
         res.status(500).json({ error: 'Failed to generate PDF' });
     }
 });
 
-// GET /api/weddings/:id/report/excel
 router.get('/excel', authMiddleware, async (req, res) => {
     try {
         const data = await getEventAndGifts(req.params.id, req.query.typistId);
         if (!data) return res.status(404).json({ error: 'Event not found' });
 
         const { event, gifts, totalAmount } = data;
-        const functionName = event.functionNameEn || 'Event';
         const workbook = new ExcelJS.Workbook();
         workbook.creator = 'Moi Application';
         const sheet = workbook.addWorksheet('Gift Report');
 
-        // ---- Event Info Header ----
         sheet.mergeCells('A1:E1');
-        sheet.getCell('A1').value = `${functionName} Gift Report`;
+        sheet.getCell('A1').value = 'Gift Report';
         sheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF6B21A8' } };
         sheet.getCell('A1').alignment = { horizontal: 'center' };
 
         sheet.mergeCells('A2:E2');
-        sheet.getCell('A2').value = `${event.groomName} & ${event.brideName}`;
+        sheet.getCell('A2').value = event.groomName;
         sheet.getCell('A2').font = { bold: true, size: 13 };
         sheet.getCell('A2').alignment = { horizontal: 'center' };
 
@@ -176,7 +179,6 @@ router.get('/excel', authMiddleware, async (req, res) => {
 
         sheet.addRow([]);
 
-        // ---- Column Headers ----
         const headerRow = sheet.addRow(['#', 'Receipt #', 'Donor Name', 'Place', 'Amount (₹)']);
         headerRow.eachCell((cell) => {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6B21A8' } };
@@ -189,7 +191,6 @@ router.get('/excel', authMiddleware, async (req, res) => {
         });
         headerRow.height = 22;
 
-        // ---- Gift Rows ----
         gifts.forEach((gift, idx) => {
             const row = sheet.addRow([
                 idx + 1,
@@ -212,7 +213,6 @@ router.get('/excel', authMiddleware, async (req, res) => {
             row.getCell(5).numFmt = '₹#,##0.00';
         });
 
-        // ---- Total Row ----
         const totalRow = sheet.addRow(['', '', '', 'TOTAL', totalAmount]);
         totalRow.eachCell((cell) => {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE9FE' } };
@@ -224,24 +224,19 @@ router.get('/excel', authMiddleware, async (req, res) => {
         });
         totalRow.getCell(5).numFmt = '₹#,##0.00';
 
-        // ---- Column Widths ----
         sheet.getColumn(1).width = 6;
         sheet.getColumn(2).width = 12;
         sheet.getColumn(3).width = 28;
         sheet.getColumn(4).width = 22;
         sheet.getColumn(5).width = 18;
 
-        const sanitize = (str) => str.replace(/[^a-z0-9\u0B80-\u0BFF]/gi, '_');
-        const safeGroom = sanitize(event.groomName);
-        const safeBride = sanitize(event.brideName);
+        const sanitize = (str) => String(str || '').replace(/[^a-z0-9\u0B80-\u0BFF]/gi, '_');
+        const safeFunction = sanitize(event.groomName);
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const filename = `${functionName}_${safeGroom}_${safeBride}_${timestamp}.xlsx`;
+        const filename = `Gift_Report_${safeFunction}_${timestamp}.xlsx`;
 
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader(
-            'Content-Disposition',
-            `attachment; filename="${encodeURIComponent(filename)}"`
-        );
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
         await workbook.xlsx.write(res);
         res.end();
     } catch (err) {

@@ -157,4 +157,89 @@ router.get('/:giftId/receipt', authMiddleware, async (req, res) => {
     }
 });
 
+// PUT /api/weddings/:id/gifts/:giftId - Update a gift
+router.put(
+    '/:giftId',
+    authMiddleware,
+    [
+        body('donorName').trim().notEmpty().withMessage('Donor name is required'),
+        body('donorPlace').trim().notEmpty().withMessage('Donor place is required'),
+        body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be a positive number'),
+        body('typistId').optional().isInt({ min: 1 }),
+        body('denominations').optional().isArray(),
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { donorName, donorPlace, amount, typistId, denominations } = req.body;
+        const { id: weddingId, giftId } = req.params;
+
+        try {
+            // Verify gift exists
+            const [existingGift] = await pool.execute(
+                'SELECT id FROM gifts WHERE id = ? AND weddingId = ?',
+                [giftId, weddingId]
+            );
+            if (existingGift.length === 0) {
+                return res.status(404).json({ error: 'Gift not found' });
+            }
+
+            const denomJson = denominations ? JSON.stringify(denominations) : null;
+
+            await pool.execute(
+                'UPDATE gifts SET donorName = ?, donorPlace = ?, amount = ?, typistId = ?, denominations = ? WHERE id = ? AND weddingId = ?',
+                [donorName, donorPlace, amount, typistId || null, denomJson, giftId, weddingId]
+            );
+
+            // Fetch updated record with typist info
+            const [rows] = await pool.execute(
+                `SELECT g.*, t.name as typistName
+         FROM gifts g
+         LEFT JOIN typists t ON g.typistId = t.id
+         WHERE g.id = ?`,
+                [giftId]
+            );
+
+            const gift = rows[0];
+            if (gift.denominations && typeof gift.denominations === 'string') {
+                gift.denominations = JSON.parse(gift.denominations);
+            }
+
+            res.json(gift);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to update gift' });
+        }
+    }
+);
+
+// DELETE /api/weddings/:id/gifts/:giftId - Delete a gift
+router.delete('/:giftId', authMiddleware, async (req, res) => {
+    const { id: weddingId, giftId } = req.params;
+
+    try {
+        // Verify gift exists
+        const [existingGift] = await pool.execute(
+            'SELECT id, amount FROM gifts WHERE id = ? AND weddingId = ?',
+            [giftId, weddingId]
+        );
+        if (existingGift.length === 0) {
+            return res.status(404).json({ error: 'Gift not found' });
+        }
+
+        await pool.execute(
+            'DELETE FROM gifts WHERE id = ? AND weddingId = ?',
+            [giftId, weddingId]
+        );
+
+        res.json({ success: true, message: 'Gift deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete gift' });
+    }
+});
+
 module.exports = router;
